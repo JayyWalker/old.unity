@@ -28,7 +28,7 @@ COPY ./docker/resources/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
 RUN pecl install xdebug-3.0.0
 
-RUN docker-php-ext-enable xdebug
+#RUN docker-php-ext-enable xdebug
 
 # Copy over the init script
 COPY ./docker/resources/init.sh /usr/local/bin
