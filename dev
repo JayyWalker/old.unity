@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+
+set -e
+
+run_ide_helpers() {
+    local interval=30
+    local duration=180
+    local seconds_accumulated=0
+
+    echo "Waiting to connect to PHP container..."
+    while (("$seconds_accumulated" <= "$duration"))
+    do
+        local output=$(docker-compose exec php netstat -an | grep :9000)
+
+        if [[ -z "$output" ]]
+        then
+            seconds_accumulated=$((seconds_accumulated + interval))
+
+            sleep "$interval"
+        else
+            docker-compose exec php composer run ide-helper
+            break
+        fi
+    done
+
+    if [ "$seconds_accumulated" -eq "$duration" ]; then
+        # If seconds_accumulated is equal to duration, PHP has no launched
+
+        echo "Failed to complete setup as PHP service has not started. Try again"
+
+        exit 1
+    elif [ "$seconds_accumulated" -lt "$duration" ]; then
+        echo "Ide helper was successful. Continuing"
+    fi
+}
+
+create_env() {
+    # check if .env exists
+    if test -f './env'; then
+        echo ".env exists"
+
+        return
+    fi
+
+    cp ./.env.example ./.env
+
+    sed -i '' -e 's/APP_KEY=/APP_KEY=base64:XESk\/hwOMfgFPNmjq0wd1QKRXLOyHb2iKGsF9ISl19w=/' ./.env
+}
+
+_start() {
+    docker-compose up -d
+}
+
+_setup() {
+    create_env
+
+    docker-compose up -d --force-recreate php mysql
+
+    run_ide_helpers
+
+    docker-compose stop
+}
+
+_default() {
+    echo "No command given"
+}
+
+_clean() {
+    docker-compose down --rmi all --volumes --remove-orphans
+
+    rm -rf ./vendor
+}
+
+_stop() {
+    docker-compose stop
+}
+
+COMMAND="${1-}"
+shift
+
+case $COMMAND in
+    "clean")
+        _clean
+    ;;
+    "setup")
+        _setup
+    ;;
+    "start")
+        _start
+    ;;
+    "stop")
+        _stop
+    ;;
+    *)
+        _default
+esac
