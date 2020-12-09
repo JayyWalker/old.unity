@@ -165,6 +165,7 @@ return [
         /*
          * Package Service Providers...
          */
+        \Eloquence\EloquenceServiceProvider::class,
 
         /*
          * Application Service Providers...
