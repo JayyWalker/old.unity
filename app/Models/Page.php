@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Eloquence\Behaviours\CamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,6 +12,11 @@ use Illuminate\Database\Eloquent\Model;
 class Page extends Model
 {
     use HasFactory;
+    use CamelCasing;
 
-    public static $snakeAttributes = true;
+    protected $fillable = [
+        'title',
+        'description',
+        'seo_title',
+    ];
 }

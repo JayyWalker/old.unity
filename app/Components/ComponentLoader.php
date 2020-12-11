@@ -17,10 +17,7 @@ class ComponentLoader
         );
 
         foreach ($definitionFiles as $filepath) {
-            $fileInfo = new \SplFileInfo($filepath);
-            $filename = substr($fileInfo->getFilename(), 0, -4);
-
-            $definitions[$filename] = Yaml::parseFile($filepath);
+            $definitions[] = Yaml::parseFile($filepath);
         }
 
         return $definitions;

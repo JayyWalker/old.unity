@@ -15,6 +15,10 @@ class CreateComponentsTable extends Migration
     {
         Schema::create('components', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('page_id')->nullable();
+            $table->string('name');
+            $table->json('fields');
+            $table->integer('order');
             $table->timestamps();
         });
     }
